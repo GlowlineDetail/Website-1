@@ -79,16 +79,19 @@
       var vehButtons = card.querySelectorAll('.veh-btn');
       var priceEl = card.querySelector('[data-price-display]');
       var excludeCheckbox = card.querySelector('[data-exclude-wash]');
+      var excludeNote = card.querySelector('[data-exclude-wash-note]');
       var bookBtn = card.querySelector('[data-book-package]');
       var currentVehicle = 'sedan';
 
       function render() {
         var priceInfo = pkg.prices[currentVehicle];
         var amount = priceInfo.amount;
-        if (excludeCheckbox && excludeCheckbox.checked && pkg.excludeWashAllowed) {
+        var washExcluded = !!(excludeCheckbox && excludeCheckbox.checked && pkg.excludeWashAllowed);
+        if (washExcluded) {
           amount += pkg.excludeWashDelta;
         }
         priceEl.textContent = formatPrice(amount, priceInfo.plus);
+        if (excludeNote) excludeNote.hidden = !washExcluded;
       }
 
       vehButtons.forEach(function (btn) {
@@ -156,6 +159,7 @@
       'Vehicle size: ' + (VEHICLE_LABELS[data.vehicleType] || data.vehicleType),
       'Year/Make/Model: ' + (data.vehicleYMM || '—'),
       'Color: ' + (data.vehicleColor || '—'),
+      'Photos selected (attach manually): ' + (data.photoFileNames.length ? data.photoFileNames.join(', ') : '—'),
       '',
       'PACKAGE & SCHEDULE',
       'Package: ' + (data.packageLabel || data.packageChoice),
@@ -203,6 +207,9 @@
         vehicleType: form.vehicleType.value,
         vehicleYMM: form.vehicleYMM.value.trim(),
         vehicleColor: form.vehicleColor.value.trim(),
+        photoFileNames: form.vehiclePhotos.files
+          ? Array.prototype.map.call(form.vehiclePhotos.files, function (f) { return f.name; })
+          : [],
         packageChoice: form.packageChoice.value,
         packageLabel: packageLabelText,
         excludeWash: form.excludeWash.checked,
@@ -222,6 +229,23 @@
     });
   }
 
+  function initPhotoField() {
+    var input = document.getElementById('vehiclePhotos');
+    var list = document.getElementById('photoFileList');
+    if (!input || !list) return;
+
+    input.addEventListener('change', function () {
+      if (!input.files || !input.files.length) {
+        list.hidden = true;
+        list.textContent = '';
+        return;
+      }
+      var names = Array.prototype.map.call(input.files, function (f) { return f.name; });
+      list.textContent = 'Selected: ' + names.join(', ');
+      list.hidden = false;
+    });
+  }
+
   function initYear() {
     var yearEl = document.getElementById('year');
     if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -232,6 +256,7 @@
     initPackageCards();
     initExcludeWashFieldGuard();
     initBookingForm();
+    initPhotoField();
     initYear();
   });
 })();

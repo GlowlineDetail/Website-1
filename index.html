@@ -137,6 +137,7 @@
 
       <div class="packages-grid">
 
+
         <!-- STANDARD -->
         <article class="package-card" data-package="standard">
           <div class="package-head">
@@ -153,6 +154,7 @@
 
           <div class="package-price">
             <span class="price-amount" data-price-display>$229.99</span>
+            <span class="price-note" data-exclude-wash-note hidden>Exterior wash excluded</span>
           </div>
 
           <label class="exclude-toggle">
@@ -230,6 +232,8 @@
         </article>
 
       </div>
+
+      <p class="pricing-disclaimer">Prices reflect standard conditions. If your vehicle needs more intensive treatment than what was booked — heavier buildup, deeper stains, extra time — we'll always confirm with you before doing any additional work, and pricing may adjust accordingly.</p>
     </div>
   </section>
 
@@ -278,6 +282,12 @@
             <div class="form-field">
               <label for="vehicleColor">Color (optional)</label>
               <input type="text" id="vehicleColor" name="vehicleColor">
+            </div>
+            <div class="form-field form-field-wide">
+              <label for="vehiclePhotos">Vehicle Photos (optional)</label>
+              <input type="file" id="vehiclePhotos" name="vehiclePhotos" accept="image/*" multiple>
+              <p class="field-help">Helps us confirm accurate pricing ahead of time. Your email app will open when you submit — please drag these photo(s) into that email before sending, they won't attach automatically.</p>
+              <p class="field-selected" id="photoFileList" hidden></p>
             </div>
           </div>
         </fieldset>
