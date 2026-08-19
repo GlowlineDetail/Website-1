@@ -2,12 +2,15 @@
   'use strict';
 
   var BOOKING_EMAIL = 'glowlinedetail@gmail.com';
+  var FORMSPREE_URL = 'https://formspree.io/f/xppakawo';
 
   var VEHICLE_LABELS = {
     sedan: 'Sedan',
     suv: 'SUV / Truck',
     thirdrow: '3rd Row'
   };
+
+  var ODOR_ADDON_DELTA = 50;
 
   // Base prices per package per vehicle size.
   // "plus: true" marks the Standard package's 3rd-row price as a starting ("$300+") price.
@@ -79,7 +82,8 @@
       var vehButtons = card.querySelectorAll('.veh-btn');
       var priceEl = card.querySelector('[data-price-display]');
       var excludeCheckbox = card.querySelector('[data-exclude-wash]');
-      var excludeNote = card.querySelector('[data-exclude-wash-note]');
+      var odorCheckbox = card.querySelector('[data-odor-addon]');
+      var priceNote = card.querySelector('[data-price-note]');
       var bookBtn = card.querySelector('[data-book-package]');
       var currentVehicle = 'sedan';
 
@@ -87,11 +91,19 @@
         var priceInfo = pkg.prices[currentVehicle];
         var amount = priceInfo.amount;
         var washExcluded = !!(excludeCheckbox && excludeCheckbox.checked && pkg.excludeWashAllowed);
-        if (washExcluded) {
-          amount += pkg.excludeWashDelta;
-        }
+        var odorAdded = !!(odorCheckbox && odorCheckbox.checked);
+        if (washExcluded) amount += pkg.excludeWashDelta;
+        if (odorAdded) amount += ODOR_ADDON_DELTA;
+
         priceEl.textContent = formatPrice(amount, priceInfo.plus);
-        if (excludeNote) excludeNote.hidden = !washExcluded;
+
+        if (priceNote) {
+          var notes = [];
+          if (washExcluded) notes.push('Exterior wash excluded');
+          if (odorAdded) notes.push('Odor removal added');
+          priceNote.textContent = notes.join(' · ');
+          priceNote.hidden = notes.length === 0;
+        }
       }
 
       vehButtons.forEach(function (btn) {
@@ -106,6 +118,9 @@
       if (excludeCheckbox) {
         excludeCheckbox.addEventListener('change', render);
       }
+      if (odorCheckbox) {
+        odorCheckbox.addEventListener('change', render);
+      }
 
       if (bookBtn) {
         bookBtn.addEventListener('click', function () {
@@ -113,11 +128,15 @@
           var packageSelect = document.getElementById('packageChoice');
           var vehicleSelect = document.getElementById('vehicleType');
           var excludeWashField = document.getElementById('excludeWashField');
+          var odorAddOnField = document.getElementById('odorAddOnField');
 
           if (packageSelect) packageSelect.value = packageKey;
           if (vehicleSelect) vehicleSelect.value = currentVehicle;
           if (excludeWashField) {
             excludeWashField.checked = !!(excludeCheckbox && excludeCheckbox.checked && pkg.excludeWashAllowed);
+          }
+          if (odorAddOnField) {
+            odorAddOnField.checked = !!(odorCheckbox && odorCheckbox.checked);
           }
 
           if (bookingSection) {
@@ -159,11 +178,12 @@
       'Vehicle size: ' + (VEHICLE_LABELS[data.vehicleType] || data.vehicleType),
       'Year/Make/Model: ' + (data.vehicleYMM || '—'),
       'Color: ' + (data.vehicleColor || '—'),
-      'Photos selected (attach manually): ' + (data.photoFileNames.length ? data.photoFileNames.join(', ') : '—'),
+      'Photos selected (attach manually — this fallback email cannot carry them): ' + (data.photoFileNames.length ? data.photoFileNames.join(', ') : '—'),
       '',
       'PACKAGE & SCHEDULE',
       'Package: ' + (data.packageLabel || data.packageChoice),
       'Exclude exterior wash: ' + (data.excludeWash ? 'Yes' : 'No'),
+      'Add odor removal treatment (+$50): ' + (data.odorAddOn ? 'Yes' : 'No'),
       'Preferred date: ' + (data.preferredDate || '—'),
       'Preferred time: ' + (data.preferredTime || '—'),
       '',
@@ -173,8 +193,53 @@
     return lines.join('\n');
   }
 
+  function setFormStatus(el, message, kind) {
+    if (!el) return;
+    el.textContent = message;
+    el.className = 'form-status' + (kind ? ' is-' + kind : '');
+    el.hidden = !message;
+  }
+
+  function collectBookingData(form) {
+    var packageSelect = document.getElementById('packageChoice');
+    var packageLabelText = packageSelect.options[packageSelect.selectedIndex]
+      ? packageSelect.options[packageSelect.selectedIndex].text
+      : packageSelect.value;
+
+    return {
+      fullName: form.fullName.value.trim(),
+      phone: form.phone.value.trim(),
+      email: form.email.value.trim(),
+      vehicleType: form.vehicleType.value,
+      vehicleYMM: form.vehicleYMM.value.trim(),
+      vehicleColor: form.vehicleColor.value.trim(),
+      photoFileNames: form.vehiclePhotos.files
+        ? Array.prototype.map.call(form.vehiclePhotos.files, function (f) { return f.name; })
+        : [],
+      packageChoice: form.packageChoice.value,
+      packageLabel: packageLabelText,
+      excludeWash: form.excludeWash.checked,
+      odorAddOn: form.odorAddOn.checked,
+      preferredDate: form.preferredDate.value,
+      preferredTime: form.preferredTime.value,
+      notes: form.notes.value.trim()
+    };
+  }
+
+  function sendViaMailtoFallback(data) {
+    var subject = 'Booking Request — ' + data.fullName + ' (' + (data.packageLabel || 'Glowline') + ')';
+    var body = buildBookingEmailBody(data);
+    var mailtoUrl = 'mailto:' + BOOKING_EMAIL +
+      '?subject=' + encodeURIComponent(subject) +
+      '&body=' + encodeURIComponent(body);
+    window.location.href = mailtoUrl;
+  }
+
   function initBookingForm() {
     var form = document.getElementById('bookingForm');
+    var statusEl = document.getElementById('formStatus');
+    var submitBtn = document.getElementById('bookingSubmitBtn');
+    var subjectField = document.getElementById('formSubject');
     if (!form) return;
 
     form.addEventListener('submit', function (e) {
@@ -195,37 +260,37 @@
         return;
       }
 
-      var packageSelect = document.getElementById('packageChoice');
-      var packageLabelText = packageSelect.options[packageSelect.selectedIndex]
-        ? packageSelect.options[packageSelect.selectedIndex].text
-        : packageSelect.value;
+      var data = collectBookingData(form);
 
-      var data = {
-        fullName: form.fullName.value.trim(),
-        phone: form.phone.value.trim(),
-        email: form.email.value.trim(),
-        vehicleType: form.vehicleType.value,
-        vehicleYMM: form.vehicleYMM.value.trim(),
-        vehicleColor: form.vehicleColor.value.trim(),
-        photoFileNames: form.vehiclePhotos.files
-          ? Array.prototype.map.call(form.vehiclePhotos.files, function (f) { return f.name; })
-          : [],
-        packageChoice: form.packageChoice.value,
-        packageLabel: packageLabelText,
-        excludeWash: form.excludeWash.checked,
-        preferredDate: form.preferredDate.value,
-        preferredTime: form.preferredTime.value,
-        notes: form.notes.value.trim()
-      };
+      if (subjectField) {
+        subjectField.value = 'Booking Request — ' + data.fullName + ' (' + (data.packageLabel || 'Glowline') + ')';
+      }
 
-      var subject = 'Booking Request — ' + data.fullName + ' (' + (data.packageLabel || 'Glowline') + ')';
-      var body = buildBookingEmailBody(data);
+      setFormStatus(statusEl, 'Sending your request…', 'pending');
+      if (submitBtn) submitBtn.disabled = true;
 
-      var mailtoUrl = 'mailto:' + BOOKING_EMAIL +
-        '?subject=' + encodeURIComponent(subject) +
-        '&body=' + encodeURIComponent(body);
+      var formData = new FormData(form);
 
-      window.location.href = mailtoUrl;
+      fetch(FORMSPREE_URL, {
+        method: 'POST',
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+      }).then(function (response) {
+        if (response.ok) {
+          setFormStatus(statusEl, "Thanks! Your booking request is in — we'll confirm shortly by phone, text, or email.", 'success');
+          form.reset();
+          var photoList = document.getElementById('photoFileList');
+          if (photoList) { photoList.hidden = true; photoList.textContent = ''; }
+          initExcludeWashFieldGuard();
+        } else {
+          throw new Error('Formspree responded with ' + response.status);
+        }
+      }).catch(function () {
+        setFormStatus(statusEl, "Couldn't reach our booking service — opening your email app instead so your request still goes through.", 'error');
+        sendViaMailtoFallback(data);
+      }).finally(function () {
+        if (submitBtn) submitBtn.disabled = false;
+      });
     });
   }
 

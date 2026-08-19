@@ -154,12 +154,17 @@
 
           <div class="package-price">
             <span class="price-amount" data-price-display>$229.99</span>
-            <span class="price-note" data-exclude-wash-note hidden>Exterior wash excluded</span>
+            <span class="price-note" data-price-note hidden></span>
           </div>
 
           <label class="exclude-toggle">
             <input type="checkbox" data-exclude-wash>
             <span>Exclude Exterior Wash <em>(&minus;$20)</em></span>
+          </label>
+
+          <label class="exclude-toggle">
+            <input type="checkbox" data-odor-addon>
+            <span>Add Odor Removal Treatment <em>(+$50)</em></span>
           </label>
 
           <ul class="package-features">
@@ -188,7 +193,13 @@
 
           <div class="package-price">
             <span class="price-amount" data-price-display>$269.99</span>
+            <span class="price-note" data-price-note hidden></span>
           </div>
+
+          <label class="exclude-toggle">
+            <input type="checkbox" data-odor-addon>
+            <span>Add Odor Removal Treatment <em>(+$50)</em></span>
+          </label>
 
           <ul class="package-features">
             <li>Full interior revival for deep stains &amp; tough grime</li>
@@ -219,7 +230,13 @@
 
           <div class="package-price">
             <span class="price-amount" data-price-display>$310.00</span>
+            <span class="price-note" data-price-note hidden></span>
           </div>
+
+          <label class="exclude-toggle">
+            <input type="checkbox" data-odor-addon>
+            <span>Add Odor Removal Treatment <em>(+$50)</em></span>
+          </label>
 
           <ul class="package-features">
             <li>Extreme interior revival</li>
@@ -243,7 +260,9 @@
       <h2 class="section-title">Request Your <span class="text-gradient">Appointment</span></h2>
       <p class="section-lead">Fill this out and we'll confirm your appointment by phone, text, or email. This is a booking <strong>request</strong> — nothing is charged now.</p>
 
-      <form id="bookingForm" class="booking-form" novalidate>
+      <form id="bookingForm" class="booking-form" novalidate
+        action="https://formspree.io/f/xppakawo" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="_subject" id="formSubject" value="New Booking Request — Glowline Detailing">
 
         <fieldset class="form-fieldset">
           <legend>Your Info</legend>
@@ -286,7 +305,7 @@
             <div class="form-field form-field-wide">
               <label for="vehiclePhotos">Vehicle Photos (optional)</label>
               <input type="file" id="vehiclePhotos" name="vehiclePhotos" accept="image/*" multiple>
-              <p class="field-help">Helps us confirm accurate pricing ahead of time. Your email app will open when you submit — please drag these photo(s) into that email before sending, they won't attach automatically.</p>
+              <p class="field-help">Helps us confirm accurate pricing ahead of time. Photos are attached automatically when you submit.</p>
               <p class="field-selected" id="photoFileList" hidden></p>
             </div>
           </div>
@@ -312,6 +331,12 @@
               </label>
             </div>
             <div class="form-field">
+              <label class="checkbox-field" for="odorAddOnField">
+                <input type="checkbox" id="odorAddOnField" name="odorAddOn">
+                <span>Add odor removal treatment <em>(all packages, +$50)</em></span>
+              </label>
+            </div>
+            <div class="form-field">
               <label for="preferredDate">Preferred Date *</label>
               <input type="date" id="preferredDate" name="preferredDate" required>
             </div>
@@ -326,8 +351,9 @@
           </div>
         </fieldset>
 
-        <button type="submit" class="btn btn-primary btn-lg btn-block">Send Booking Request</button>
-        <p class="form-note">This opens your email app with your request pre-filled to <a href="mailto:glowlinedetail@gmail.com">glowlinedetail@gmail.com</a>. Prefer to talk? Call or text <a href="tel:7202431678">720-243-1678</a>.</p>
+        <button type="submit" class="btn btn-primary btn-lg btn-block" id="bookingSubmitBtn">Send Booking Request</button>
+        <p class="form-status" id="formStatus" role="status" aria-live="polite" hidden></p>
+        <p class="form-note">Your request (and photos, if attached) goes straight to <a href="mailto:glowlinedetail@gmail.com">glowlinedetail@gmail.com</a>. Prefer to talk? Call or text <a href="tel:7202431678">720-243-1678</a>.</p>
       </form>
     </div>
   </section>
