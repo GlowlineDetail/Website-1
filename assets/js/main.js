@@ -336,16 +336,25 @@
       delayCounters.set(parent, index + 1);
     });
 
-    var observer = new IntersectionObserver(function (entries, obs) {
+    function onIntersect(entries, obs) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
           entry.target.classList.add('is-visible');
           obs.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+    }
 
-    elements.forEach(function (el) { observer.observe(el); });
+    // Below-the-fold content waits until it's meaningfully scrolled into
+    // view. Hero content reveals immediately on load regardless of exact
+    // viewport height, so it never gets stuck hidden on short screens.
+    var belowFold = new IntersectionObserver(onIntersect, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+    var aboveFold = new IntersectionObserver(onIntersect, { threshold: 0 });
+
+    elements.forEach(function (el) {
+      var observer = el.closest('.hero') ? aboveFold : belowFold;
+      observer.observe(el);
+    });
   }
 
   document.addEventListener('DOMContentLoaded', function () {

@@ -249,12 +249,22 @@ body::before {
 }
 .hero-logo { max-width: 220px; margin: 0 auto 12px; filter: drop-shadow(0 0 28px rgba(255, 47, 158, 0.45)); }
 .hero-tagline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-family: var(--font-display);
   color: var(--silver);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   font-size: 0.85rem;
   margin-bottom: 1.2em;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  padding: 8px 20px;
+  box-shadow: var(--glass-sheen);
 }
 .glow-dot { color: var(--gold); }
 .hero-headline {
@@ -272,6 +282,9 @@ body::before {
 .hero-scroll-cue {
   position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
   width: 26px; height: 42px; border: 2px solid rgba(255,255,255,0.35); border-radius: 20px; z-index: 2;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 .hero-scroll-cue span {
   position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
@@ -662,9 +675,11 @@ body::before {
     flex-direction: column;
     position: absolute;
     top: 100%; left: 0; right: 0;
-    background: var(--bg-alt);
+    background: rgba(7, 7, 10, 0.7);
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
     padding: 20px 24px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--glass-border);
     gap: 18px;
   }
   .section { padding: 64px 0; }
