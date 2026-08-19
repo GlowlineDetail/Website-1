@@ -71,6 +71,53 @@
     });
   }
 
+  function initHeaderScrollState() {
+    var header = document.getElementById('siteHeader');
+    if (!header) return;
+
+    function update() {
+      header.classList.toggle('is-scrolled', window.scrollY > 12);
+    }
+
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+  }
+
+  function initScrollReveal() {
+    var staggerGroups = [
+      { selector: '.service-card', step: 60, max: 300 },
+      { selector: '.package-card', step: 100, max: 200 }
+    ];
+    staggerGroups.forEach(function (g) {
+      document.querySelectorAll(g.selector).forEach(function (el, i) {
+        el.style.setProperty('--reveal-delay', Math.min(i * g.step, g.max) + 'ms');
+      });
+    });
+
+    var targets = document.querySelectorAll(
+      '.section-title, .section-lead, .service-card, .package-card, .showcase-copy, .showcase-video-wrap, .booking-form, .pricing-disclaimer'
+    );
+    if (!targets.length) return;
+
+    targets.forEach(function (el) { el.classList.add('reveal'); });
+
+    if (!('IntersectionObserver' in window)) {
+      targets.forEach(function (el) { el.classList.add('is-visible'); });
+      return;
+    }
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+    targets.forEach(function (el) { observer.observe(el); });
+  }
+
   function initPackageCards() {
     var cards = document.querySelectorAll('.package-card');
 
@@ -86,6 +133,7 @@
       var priceNote = card.querySelector('[data-price-note]');
       var bookBtn = card.querySelector('[data-book-package]');
       var currentVehicle = 'sedan';
+      var isFirstRender = true;
 
       function render() {
         var priceInfo = pkg.prices[currentVehicle];
@@ -96,6 +144,13 @@
         if (odorAdded) amount += ODOR_ADDON_DELTA;
 
         priceEl.textContent = formatPrice(amount, priceInfo.plus);
+
+        if (!isFirstRender) {
+          priceEl.classList.remove('is-updating');
+          void priceEl.offsetWidth;
+          priceEl.classList.add('is-updating');
+        }
+        isFirstRender = false;
 
         if (priceNote) {
           var notes = [];
@@ -318,6 +373,8 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     initHeaderNav();
+    initHeaderScrollState();
+    initScrollReveal();
     initPackageCards();
     initExcludeWashFieldGuard();
     initBookingForm();

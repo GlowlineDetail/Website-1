@@ -63,6 +63,33 @@ input, select, textarea { font: inherit; }
   * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
 
+/* ============================================
+   Motion — scroll reveal & entrance animations
+   ============================================ */
+@keyframes revealIn {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.js .reveal { opacity: 0; transform: translateY(28px); }
+.reveal.is-visible {
+  animation: revealIn 700ms cubic-bezier(0.16, 0.84, 0.44, 1) forwards;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+@keyframes heroFadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.js .hero-content > * {
+  opacity: 0;
+  animation: heroFadeUp 800ms cubic-bezier(0.16, 0.84, 0.44, 1) forwards;
+}
+.hero-logo { animation-delay: 80ms; }
+.hero-tagline { animation-delay: 200ms; }
+.hero-headline { animation-delay: 320ms; }
+.hero-sub { animation-delay: 440ms; }
+.hero-cta { animation-delay: 560ms; }
+
 .section-inner {
   max-width: var(--container);
   margin: 0 auto;
@@ -121,11 +148,24 @@ input, select, textarea { font: inherit; }
 }
 .btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 .btn-primary {
+  position: relative;
+  overflow: hidden;
   background: var(--gradient-brand);
   color: #fff;
   box-shadow: var(--shadow-glow-pink);
 }
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -60%;
+  width: 40%; height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transform: skewX(-20deg);
+  transition: left 550ms ease;
+  pointer-events: none;
+}
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 32px rgba(255, 47, 158, 0.5); }
+.btn-primary:hover::after { left: 130%; }
 .btn-outline {
   background: transparent;
   color: var(--text);
@@ -146,6 +186,12 @@ input, select, textarea { font: inherit; }
   background: rgba(7, 7, 10, 0.75);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border);
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  transition: background 240ms ease, box-shadow 240ms ease, border-color 240ms ease;
+}
+.site-header.is-scrolled {
+  background: rgba(7, 7, 10, 0.92);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
 }
 .header-inner {
   max-width: var(--container);
@@ -155,8 +201,11 @@ input, select, textarea { font: inherit; }
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  transition: padding 240ms ease;
 }
-.brand-logo { height: 52px; width: auto; border-radius: 8px; }
+.site-header.is-scrolled .header-inner { padding-top: 6px; padding-bottom: 6px; }
+.brand-logo { height: 52px; width: auto; border-radius: 8px; transition: height 240ms ease; }
+.site-header.is-scrolled .brand-logo { height: 40px; }
 .main-nav {
   display: flex;
   gap: 28px;
@@ -175,7 +224,14 @@ input, select, textarea { font: inherit; }
   gap: 5px;
   background: none; border: none; padding: 8px;
 }
-.nav-toggle span { width: 24px; height: 2px; background: var(--text); display: block; }
+.nav-toggle span {
+  width: 24px; height: 2px; background: var(--text); display: block;
+  transition: transform 220ms ease, opacity 220ms ease;
+  transform-origin: center;
+}
+.site-header.is-open .nav-toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.site-header.is-open .nav-toggle span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.site-header.is-open .nav-toggle span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 /* ============================================
    Hero
@@ -268,7 +324,9 @@ input, select, textarea { font: inherit; }
   color: var(--pink);
   margin-bottom: 12px;
   text-shadow: 0 0 14px rgba(255, 47, 158, 0.6);
+  transition: transform 260ms ease;
 }
+.service-card:hover .service-icon { transform: scale(1.2) rotate(8deg); }
 .service-card h3 { font-size: 1.05rem; margin-bottom: 0.4em; }
 .service-card p { color: var(--text-muted); font-size: 0.95rem; margin: 0; }
 
@@ -296,6 +354,11 @@ input, select, textarea { font: inherit; }
   background: var(--gradient-glow);
   z-index: -1;
   filter: blur(30px);
+  animation: glowPulse 4s ease-in-out infinite;
+}
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
 }
 .showcase-copy p:not(.eyebrow) { color: var(--text-muted); font-size: 1.05rem; max-width: 480px; }
 
@@ -321,8 +384,19 @@ input, select, textarea { font: inherit; }
 .package-card:hover { transform: translateY(-4px); }
 .package-card.is-featured {
   border-color: rgba(255, 47, 158, 0.55);
-  box-shadow: 0 0 0 1px rgba(255, 47, 158, 0.25), var(--shadow-glow-pink);
   background: linear-gradient(180deg, rgba(255, 47, 158, 0.08), var(--bg-card) 30%);
+}
+.package-card.is-featured::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  animation: featuredGlow 3.2s ease-in-out infinite;
+}
+@keyframes featuredGlow {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(255, 47, 158, 0.25), 0 0 24px rgba(255, 47, 158, 0.35); }
+  50% { box-shadow: 0 0 0 1px rgba(255, 47, 158, 0.4), 0 0 40px rgba(255, 47, 158, 0.55); }
 }
 .most-popular-badge {
   position: absolute;
@@ -384,12 +458,19 @@ input, select, textarea { font: inherit; }
   margin-bottom: 18px;
 }
 .price-amount {
+  display: inline-block;
   font-family: var(--font-display);
   font-size: 2.2rem;
   background: var(--gradient-warm);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+.price-amount.is-updating { animation: pricePop 420ms ease; }
+@keyframes pricePop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.1); }
+  100% { transform: scale(1); }
 }
 .price-note { display: block; color: var(--gold); font-size: 0.8rem; margin-top: 6px; letter-spacing: 0.02em; }
 
@@ -602,18 +683,28 @@ input, select, textarea { font: inherit; }
 }
 
 @media (max-width: 720px) {
-  .main-nav { display: none; }
-  .nav-toggle { display: flex; }
-  .phone-link { display: none; }
-  .site-header.is-open .main-nav {
+  .main-nav {
     display: flex;
     flex-direction: column;
     position: absolute;
     top: 100%; left: 0; right: 0;
     background: var(--bg-alt);
-    padding: 20px 24px;
+    padding: 0 24px;
     border-bottom: 1px solid var(--border);
     gap: 18px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition: max-height 320ms ease, opacity 240ms ease, padding 320ms ease;
+  }
+  .nav-toggle { display: flex; }
+  .phone-link { display: none; }
+  .site-header.is-open .main-nav {
+    max-height: 320px;
+    opacity: 1;
+    padding: 20px 24px;
+    pointer-events: auto;
   }
   .section { padding: 64px 0; }
 }
