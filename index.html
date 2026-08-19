@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
+<script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
 
@@ -62,47 +63,47 @@
       <p class="eyebrow">What We Do</p>
       <h2 class="section-title">Full-Spectrum <span class="text-gradient">Detailing Services</span></h2>
       <div class="services-grid">
-        <div class="service-card">
+        <div class="service-card reveal">
           <span class="service-icon" aria-hidden="true">◆</span>
           <h3>Interior Cleaning</h3>
           <p>Deep vacuum, wipe-down, and refresh of every surface inside your cabin.</p>
         </div>
-        <div class="service-card">
+        <div class="service-card reveal">
           <span class="service-icon" aria-hidden="true">◆</span>
           <h3>Steam Treatment</h3>
           <p>High-heat steam extraction that sanitizes seats, carpets, and tight crevices.</p>
         </div>
-        <div class="service-card">
+        <div class="service-card reveal">
           <span class="service-icon" aria-hidden="true">◆</span>
           <h3>Stain Removal</h3>
           <p>Targeted spot treatment for tough, set-in stains on fabric and upholstery.</p>
         </div>
-        <div class="service-card">
+        <div class="service-card reveal">
           <span class="service-icon" aria-hidden="true">◆</span>
           <h3>Odor Removal</h3>
           <p>Neutralize smoke, pet, and everyday odors at the source — not just masked.</p>
         </div>
-        <div class="service-card">
+        <div class="service-card reveal">
           <span class="service-icon" aria-hidden="true">◆</span>
           <h3>UV Protection</h3>
           <p>Shield plastics and trim from sun damage, fading, and cracking.</p>
         </div>
-        <div class="service-card">
+        <div class="service-card reveal">
           <span class="service-icon" aria-hidden="true">◆</span>
           <h3>Wash &amp; Wax</h3>
           <p>Hand wash and protective wax finish for a deep, reflective shine.</p>
         </div>
-        <div class="service-card">
+        <div class="service-card reveal">
           <span class="service-icon" aria-hidden="true">◆</span>
           <h3>Clay Bar Treatment</h3>
           <p>Strip bonded contaminants from your paint for a glass-smooth surface.</p>
         </div>
-        <div class="service-card">
+        <div class="service-card reveal">
           <span class="service-icon" aria-hidden="true">◆</span>
           <h3>Engine Bay Cleaning</h3>
           <p>Safe degreasing and detailing to make your engine bay showroom-ready.</p>
         </div>
-        <div class="service-card">
+        <div class="service-card reveal">
           <span class="service-icon" aria-hidden="true">◆</span>
           <h3>Spray Ceramic Coating</h3>
           <p>Long-lasting hydrophobic protection that locks in gloss and shine.</p>
@@ -113,14 +114,14 @@
 
   <section id="showcase" class="section showcase">
     <div class="section-inner showcase-inner">
-      <div class="showcase-video-wrap">
+      <div class="showcase-video-wrap reveal">
         <video class="showcase-video" autoplay muted loop playsinline preload="metadata">
           <source src="assets/video/showcase.mp4" type="video/mp4">
           <source src="assets/video/showcase.webm" type="video/webm">
         </video>
         <div class="showcase-video-glow" aria-hidden="true"></div>
       </div>
-      <div class="showcase-copy">
+      <div class="showcase-copy reveal">
         <p class="eyebrow">See It In Motion</p>
         <h2 class="section-title">The Glowline <span class="text-gradient">Process</span></h2>
         <p>From the first foam pass to the final wipe-down, every detail is worked by hand. Watch what "showroom ready" actually looks like.</p>
@@ -139,7 +140,7 @@
 
 
         <!-- STANDARD -->
-        <article class="package-card" data-package="standard">
+        <article class="package-card reveal" data-package="standard">
           <div class="package-head">
             <h3>Standard Package</h3>
             <p class="package-tag">Interior / Exterior Detail</p>
@@ -177,7 +178,7 @@
         </article>
 
         <!-- SIGNATURE -->
-        <article class="package-card is-featured" data-package="signature">
+        <article class="package-card is-featured reveal" data-package="signature">
           <span class="most-popular-badge"><span class="badge-emblem" aria-hidden="true">★</span> Most Popular</span>
           <div class="package-head">
             <h3>Signature Package</h3>
@@ -215,7 +216,7 @@
         </article>
 
         <!-- PREMIUM -->
-        <article class="package-card" data-package="premium">
+        <article class="package-card reveal" data-package="premium">
           <div class="package-head">
             <h3>Premium Detail</h3>
             <p class="package-tag">"Showroom Ready"</p>
@@ -260,7 +261,7 @@
       <h2 class="section-title">Request Your <span class="text-gradient">Appointment</span></h2>
       <p class="section-lead">Fill this out and we'll confirm your appointment by phone, text, or email. This is a booking <strong>request</strong> — nothing is charged now.</p>
 
-      <form id="bookingForm" class="booking-form" novalidate
+      <form id="bookingForm" class="booking-form reveal" novalidate
         action="https://formspree.io/f/xppakawo" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="_subject" id="formSubject" value="New Booking Request — Glowline Detailing">
 

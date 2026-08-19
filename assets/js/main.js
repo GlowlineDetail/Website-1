@@ -316,6 +316,38 @@
     if (yearEl) yearEl.textContent = new Date().getFullYear();
   }
 
+  function initScrollReveal() {
+    var elements = document.querySelectorAll('.reveal');
+    if (!elements.length) return;
+
+    if (!('IntersectionObserver' in window) ||
+        (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+      elements.forEach(function (el) { el.classList.add('is-visible'); });
+      return;
+    }
+
+    // Stagger siblings within the same grid/parent so cards cascade in
+    // instead of popping together.
+    var delayCounters = new WeakMap();
+    elements.forEach(function (el) {
+      var parent = el.parentElement;
+      var index = delayCounters.get(parent) || 0;
+      el.style.transitionDelay = Math.min(index * 70, 350) + 'ms';
+      delayCounters.set(parent, index + 1);
+    });
+
+    var observer = new IntersectionObserver(function (entries, obs) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+    elements.forEach(function (el) { observer.observe(el); });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     initHeaderNav();
     initPackageCards();
@@ -323,5 +355,6 @@
     initBookingForm();
     initPhotoField();
     initYear();
+    initScrollReveal();
   });
 })();

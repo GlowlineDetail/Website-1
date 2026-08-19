@@ -23,6 +23,14 @@
   --shadow-glow-pink: 0 0 24px rgba(255, 47, 158, 0.35);
   --shadow-glow-purple: 0 0 24px rgba(155, 92, 255, 0.35);
 
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-bg-strong: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-blur: 18px;
+  --glass-sheen: inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 8px 32px rgba(0, 0, 0, 0.35);
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
   --font-display: 'Audiowide', 'Rajdhani', sans-serif;
   --font-body: 'Rajdhani', system-ui, sans-serif;
 
@@ -51,6 +59,21 @@ button { font: inherit; cursor: pointer; }
 h1, h2, h3, h4 { margin: 0 0 0.5em; font-family: var(--font-display); font-weight: 400; line-height: 1.15; }
 p { margin: 0 0 1em; }
 input, select, textarea { font: inherit; }
+
+/* Ambient gradient field — glows sit behind every section so glass surfaces
+   have color to pick up. Fixed so it stays consistent across scroll. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(circle at 12% 15%, rgba(255, 47, 158, 0.16), transparent 42%),
+    radial-gradient(circle at 88% 8%, rgba(155, 92, 255, 0.18), transparent 45%),
+    radial-gradient(circle at 50% 85%, rgba(255, 154, 60, 0.10), transparent 50%),
+    var(--bg);
+  pointer-events: none;
+}
 
 .skip-link {
   position: absolute; left: -999px; top: 0;
@@ -98,7 +121,16 @@ input, select, textarea { font: inherit; }
 }
 
 .section { padding: 96px 0; position: relative; }
-.section:nth-of-type(even) { background: var(--bg-alt); }
+.section + .section { border-top: 1px solid var(--border); }
+
+/* Scroll-reveal: only armed once JS confirms it can animate them back in,
+   so content stays visible by default (no-JS / crawlers unaffected). */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+.js .reveal.is-visible { opacity: 1; transform: translateY(0); }
 
 /* ============================================
    Buttons
@@ -115,7 +147,7 @@ input, select, textarea { font: inherit; }
   letter-spacing: 0.06em;
   text-transform: uppercase;
   border: 1px solid transparent;
-  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease, border-color 180ms ease;
+  transition: transform 320ms var(--ease), box-shadow 320ms var(--ease), background 320ms var(--ease), border-color 320ms var(--ease);
   min-height: 44px;
   cursor: pointer;
 }
@@ -125,13 +157,17 @@ input, select, textarea { font: inherit; }
   color: #fff;
   box-shadow: var(--shadow-glow-pink);
 }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 32px rgba(255, 47, 158, 0.5); }
+.btn-primary:hover { transform: translateY(-2px) scale(1.015); box-shadow: 0 0 32px rgba(255, 47, 158, 0.5); }
+.btn-primary:active { transform: translateY(0) scale(0.98); }
 .btn-outline {
-  background: transparent;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   color: var(--text);
   border-color: rgba(255, 255, 255, 0.35);
 }
-.btn-outline:hover { border-color: var(--purple); color: var(--purple); transform: translateY(-2px); }
+.btn-outline:hover { border-color: var(--purple); color: var(--purple); background: var(--glass-bg-strong); transform: translateY(-2px) scale(1.015); }
+.btn-outline:active { transform: translateY(0) scale(0.98); }
 .btn-lg { padding: 16px 34px; font-size: 0.95rem; }
 .btn-small { padding: 9px 18px; font-size: 0.75rem; }
 .btn-block { width: 100%; }
@@ -143,9 +179,11 @@ input, select, textarea { font: inherit; }
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 100;
-  background: rgba(7, 7, 10, 0.75);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border);
+  background: rgba(7, 7, 10, 0.6);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border-bottom: 1px solid var(--glass-border);
+  transition: background 320ms var(--ease);
 }
 .header-inner {
   max-width: var(--container);
@@ -251,16 +289,20 @@ input, select, textarea { font: inherit; }
   gap: 20px;
 }
 .service-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   padding: 28px 24px;
-  transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+  box-shadow: var(--glass-sheen);
+  transition: transform 360ms var(--ease), border-color 360ms var(--ease), box-shadow 360ms var(--ease), background 360ms var(--ease);
 }
 .service-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-6px) scale(1.01);
   border-color: rgba(155, 92, 255, 0.5);
-  box-shadow: var(--shadow-glow-purple);
+  background: var(--glass-bg-strong);
+  box-shadow: var(--glass-sheen), var(--shadow-glow-purple);
 }
 .service-icon {
   display: inline-block;
@@ -288,7 +330,8 @@ input, select, textarea { font: inherit; }
   aspect-ratio: 9 / 16;
   max-width: 340px;
   justify-self: center;
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-sheen);
 }
 .showcase-video { width: 100%; height: 100%; object-fit: cover; }
 .showcase-video-glow {
@@ -310,19 +353,25 @@ input, select, textarea { font: inherit; }
 }
 .package-card {
   position: relative;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   padding: 32px 28px;
   display: flex;
   flex-direction: column;
-  transition: transform 200ms ease, box-shadow 200ms ease;
+  box-shadow: var(--glass-sheen);
+  transition: transform 360ms var(--ease), box-shadow 360ms var(--ease), background 360ms var(--ease);
 }
-.package-card:hover { transform: translateY(-4px); }
+.package-card:hover { transform: translateY(-6px) scale(1.008); background: var(--glass-bg-strong); }
 .package-card.is-featured {
   border-color: rgba(255, 47, 158, 0.55);
-  box-shadow: 0 0 0 1px rgba(255, 47, 158, 0.25), var(--shadow-glow-pink);
-  background: linear-gradient(180deg, rgba(255, 47, 158, 0.08), var(--bg-card) 30%);
+  box-shadow: 0 0 0 1px rgba(255, 47, 158, 0.25), var(--glass-sheen), var(--shadow-glow-pink);
+  background: linear-gradient(180deg, rgba(255, 47, 158, 0.12), var(--glass-bg) 45%);
+}
+.package-card.is-featured:hover {
+  background: linear-gradient(180deg, rgba(255, 47, 158, 0.16), var(--glass-bg-strong) 45%);
 }
 .most-popular-badge {
   position: absolute;
@@ -437,10 +486,13 @@ input, select, textarea { font: inherit; }
    Booking Form
    ============================================ */
 .booking-form {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   padding: 36px;
+  box-shadow: var(--glass-sheen);
 }
 .form-fieldset {
   border: none;
